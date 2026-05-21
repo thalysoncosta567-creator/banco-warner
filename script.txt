@@ -1,0 +1,116 @@
+-- MySQL Workbench Forward Engineering
+
+SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
+SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
+SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
+
+-- -----------------------------------------------------
+-- Schema mydb
+-- -----------------------------------------------------
+
+-- -----------------------------------------------------
+-- Schema mydb
+-- -----------------------------------------------------
+CREATE SCHEMA IF NOT EXISTS `mydb` DEFAULT CHARACTER SET utf8 ;
+-- -----------------------------------------------------
+-- Schema sistema
+-- -----------------------------------------------------
+
+-- -----------------------------------------------------
+-- Schema sistema
+-- -----------------------------------------------------
+CREATE SCHEMA IF NOT EXISTS `sistema` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci ;
+USE `mydb` ;
+
+-- -----------------------------------------------------
+-- Table `mydb`.`clientes`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mydb`.`clientes` (
+  `idclientes` INT NOT NULL AUTO_INCREMENT,
+  `nome` VARCHAR(45) NOT NULL,
+  `cpf` INT NOT NULL,
+  `email` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`idclientes`),
+  UNIQUE INDEX `idclientes_UNIQUE` (`idclientes` ASC) VISIBLE,
+  UNIQUE INDEX `cpf_UNIQUE` (`cpf` ASC) VISIBLE,
+  UNIQUE INDEX `email_UNIQUE` (`email` ASC) VISIBLE)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`chamados`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mydb`.`chamados` (
+  `idchamados` INT NOT NULL AUTO_INCREMENT,
+  `abertura` DATETIME NOT NULL,
+  `motivo` MEDIUMTEXT NOT NULL,
+  `status` VARCHAR(45) NOT NULL,
+  `clientes_idclientes` INT NOT NULL,
+  PRIMARY KEY (`idchamados`, `clientes_idclientes`),
+  UNIQUE INDEX `idchamados_UNIQUE` (`idchamados` ASC) VISIBLE,
+  INDEX `fk_chamados_clientes_idx` (`clientes_idclientes` ASC) VISIBLE,
+  CONSTRAINT `fk_chamados_clientes`
+    FOREIGN KEY (`clientes_idclientes`)
+    REFERENCES `mydb`.`clientes` (`idclientes`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`tecnicos`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mydb`.`tecnicos` (
+  `idtecnicos` INT NOT NULL AUTO_INCREMENT,
+  `nome` VARCHAR(45) NOT NULL,
+  `cpf` VARCHAR(45) NOT NULL,
+  `inicio` DATETIME NOT NULL,
+  PRIMARY KEY (`idtecnicos`),
+  UNIQUE INDEX `idtecnicos_UNIQUE` (`idtecnicos` ASC) VISIBLE,
+  UNIQUE INDEX `cpf_UNIQUE` (`cpf` ASC) VISIBLE)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`chamados_has_tecnicos`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mydb`.`chamados_has_tecnicos` (
+  `chamados_idchamados` INT NOT NULL,
+  `chamados_clientes_idclientes` INT NOT NULL,
+  `tecnicos_idtecnicos` INT NOT NULL,
+  PRIMARY KEY (`chamados_idchamados`, `chamados_clientes_idclientes`, `tecnicos_idtecnicos`),
+  INDEX `fk_chamados_has_tecnicos_tecnicos1_idx` (`tecnicos_idtecnicos` ASC) VISIBLE,
+  INDEX `fk_chamados_has_tecnicos_chamados1_idx` (`chamados_idchamados` ASC, `chamados_clientes_idclientes` ASC) VISIBLE,
+  CONSTRAINT `fk_chamados_has_tecnicos_chamados1`
+    FOREIGN KEY (`chamados_idchamados` , `chamados_clientes_idclientes`)
+    REFERENCES `mydb`.`chamados` (`idchamados` , `clientes_idclientes`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_chamados_has_tecnicos_tecnicos1`
+    FOREIGN KEY (`tecnicos_idtecnicos`)
+    REFERENCES `mydb`.`tecnicos` (`idtecnicos`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+USE `sistema` ;
+
+-- -----------------------------------------------------
+-- Table `sistema`.`usuarios`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `sistema`.`usuarios` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `nome` VARCHAR(45) NOT NULL,
+  `email` VARCHAR(45) NOT NULL,
+  `senha` VARCHAR(45) NOT NULL,
+  `admin` INT NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE INDEX `email_UNIQUE` (`email` ASC) VISIBLE)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_0900_ai_ci;
+
+
+SET SQL_MODE=@OLD_SQL_MODE;
+SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
+SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
